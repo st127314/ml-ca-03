@@ -1,0 +1,80 @@
+{
+  "experiment": "st127314-a3",
+  "registered_model": "st127314-a3-model",
+  "price_bin_edges": [
+    null,
+    250000.0,
+    409999.0,
+    645000.0,
+    null
+  ],
+  "best": {
+    "l2_lambda": 0.0,
+    "learning_rate": 0.05,
+    "validation_accuracy": 0.7355371900826446,
+    "validation_macro_f1": 0.7291436334531199,
+    "validation_weighted_f1": 0.73454161680517,
+    "test_accuracy": 0.7398971344599559,
+    "test_macro_f1": 0.7344271759177214,
+    "test_weighted_f1": 0.7379895246716924
+  },
+  "all_runs": [
+    {
+      "l2_lambda": 0.0,
+      "learning_rate": 0.03,
+      "validation_accuracy": 0.7300275482093664,
+      "validation_macro_f1": 0.7227845086536627,
+      "validation_weighted_f1": 0.7283716263621097
+    },
+    {
+      "l2_lambda": 0.0,
+      "learning_rate": 0.05,
+      "validation_accuracy": 0.7355371900826446,
+      "validation_macro_f1": 0.7291436334531199,
+      "validation_weighted_f1": 0.73454161680517
+    },
+    {
+      "l2_lambda": 1e-05,
+      "learning_rate": 0.03,
+      "validation_accuracy": 0.7300275482093664,
+      "validation_macro_f1": 0.7227845086536627,
+      "validation_weighted_f1": 0.7283716263621097
+    },
+    {
+      "l2_lambda": 1e-05,
+      "learning_rate": 0.05,
+      "validation_accuracy": 0.7355371900826446,
+      "validation_macro_f1": 0.7291436334531199,
+      "validation_weighted_f1": 0.73454161680517
+    },
+    {
+      "l2_lambda": 0.0001,
+      "learning_rate": 0.03,
+      "validation_accuracy": 0.7300275482093664,
+      "validation_macro_f1": 0.722907364822136,
+      "validation_weighted_f1": 0.7284943697150014
+    },
+    {
+      "l2_lambda": 0.0001,
+      "learning_rate": 0.05,
+      "validation_accuracy": 0.7355371900826446,
+      "validation_macro_f1": 0.7291436334531199,
+      "validation_weighted_f1": 0.73454161680517
+    },
+    {
+      "l2_lambda": 0.001,
+      "learning_rate": 0.03,
+      "validation_accuracy": 0.7263544536271809,
+      "validation_macro_f1": 0.7186412758351444,
+      "validation_weighted_f1": 0.7242834931151111
+    },
+    {
+      "l2_lambda": 0.001,
+      "learning_rate": 0.05,
+      "validation_accuracy": 0.7309458218549127,
+      "validation_macro_f1": 0.7215776476881692,
+      "validation_weighted_f1": 0.726676880600621
+    }
+  ],
+  "scratch_matches_sklearn": true
+}

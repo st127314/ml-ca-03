@@ -1,0 +1,41 @@
+# macOS and editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.python-version
+*.pdf
+
+# Tests, coverage, and build output
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow local state (remote experiment metadata is not committed)
+mlflow.db
+mlruns/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Runtime files
+*.log
+*.pid

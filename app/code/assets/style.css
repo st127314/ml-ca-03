@@ -1,0 +1,274 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f5f6f8;
+  color: #1f2430;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 40px;
+  background: #1d5b48;
+  color: #fff;
+}
+
+.nav-brand {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  color: #d7dae2;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: #7a8194;
+  margin: 0 0 8px;
+}
+
+.hero {
+  padding: 24px 0 32px;
+}
+
+.hero h1 {
+  margin: 0 0 12px;
+  font-size: 2rem;
+}
+
+.lede {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #4a5266;
+  max-width: 640px;
+}
+
+.content-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.card p {
+  line-height: 1.6;
+  color: #3a4155;
+}
+
+.stat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0 20px;
+}
+
+.stat-card {
+  flex: 1 1 160px;
+  background: #f5f6f8;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #6a7188;
+  margin: 4px 0 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.85rem;
+  color: #4a5266;
+}
+
+.form-field input {
+  padding: 8px 10px;
+  border: 1px solid #d7dae2;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.predict-button {
+  background: #2f6fed;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.predict-button:hover {
+  background: #2559c7;
+}
+
+/* Two buttons on the landing page now that there are two models. The second is outlined
+   rather than filled so it reads as an alternative, not an afterthought. */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.predict-button.secondary {
+  background: #fff;
+  color: #2f6fed;
+  border: 1px solid #2f6fed;
+}
+
+.predict-button.secondary:hover {
+  background: #eef3fe;
+}
+
+.result-card {
+  position: sticky;
+  top: 24px;
+  text-align: center;
+}
+
+.prediction-output {
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.result-label {
+  margin: 0;
+  color: #6a7188;
+}
+
+.price-value {
+  margin: 4px 0 0;
+  font-size: 2rem;
+  color: #1f2430;
+}
+
+.result-warning {
+  color: #b4472f;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.helper-text {
+  font-size: 0.8rem;
+  color: #8890a3;
+}
+
+@media (max-width: 720px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- A2 additions: the explanation card and coefficient list on the new page --- */
+.content-grid.single {
+    grid-template-columns: 1fr;
+}
+
+.explain-card .metric-block {
+    margin: 14px 0 6px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.metric-label {
+    color: #566;
+    font-size: 0.9rem;
+}
+
+.metric-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.coef-list {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    font-size: 0.85rem;
+    color: #566;
+    line-height: 1.6;
+}
+
+.coef-list li {
+    font-variant-numeric: tabular-nums;
+}
+
+/* A3 keeps A1/A2's visual language, with four equal price-band cards. */
+.stat-grid .stat-card {
+  min-width: 180px;
+}
+
+.result-card .coef-list {
+  text-align: left;
+  margin: 18px auto 0;
+  width: fit-content;
+}
