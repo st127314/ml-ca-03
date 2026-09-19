@@ -35,3 +35,14 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/car-price-classifier-a3:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/car-price-classifier-a3:${{ github.sha }}
+
+  deploy:
+    needs: build-and-deploy
+    runs-on: [self-hosted, st127314-a3]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull latest image and redeploy
+        run: |
+          docker compose -f app/docker-compose.yaml pull
+          docker compose -f app/docker-compose.yaml up -d

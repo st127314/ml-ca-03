@@ -98,5 +98,26 @@ notebook cannot accidentally create server runs.
 Add GitHub repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`. On a push to
 `main` or `master`, GitHub Actions runs pytest. Only after it passes does the workflow
 build and push both `latest` and commit-SHA Docker tags. The supplied
-`app/docker-compose.yaml` matches the course VM's Traefik pattern and pulls the `latest`
-image. Replace the Docker Hub namespace or set `DOCKERHUB_USER` on the VM if needed.
+`app/docker-compose.yaml` matches the course VM's Traefik pattern (host
+`web-st127314-a3.ml.brain.cs.ait.ac.th`) and pulls the `latest` image. Replace the Docker
+Hub namespace or set `DOCKERHUB_USER` on the VM if needed.
+
+The course VM is not reachable from GitHub's hosted runners, so the final `deploy` job
+runs on a **self-hosted runner installed on the VM itself** — the runner only makes
+outbound requests to GitHub to fetch jobs, so no inbound access to the VM is required.
+One-time setup on the VM:
+
+1. In the GitHub repo, go to **Settings → Actions → Runners → New self-hosted runner**
+   and follow the download/config commands shown for Linux x64.
+2. When prompted for labels, add `st127314-a3` (matches `runs-on: [self-hosted,
+   st127314-a3]` in the workflow) so this runner only picks up this repo's deploy jobs.
+3. Install it as a background service so it survives reboots/logout:
+   ```bash
+   sudo ./svc.sh install
+   sudo ./svc.sh start
+   ```
+4. Confirm `docker` and the external `web` Traefik network already exist on the VM
+   (`docker network ls | grep web`), since `docker-compose.yaml` depends on both.
+
+Once the runner is online, every push to `main`/`master` that passes tests will build,
+push, and then automatically run `docker compose pull && docker compose up -d` on the VM.

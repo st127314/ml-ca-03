@@ -1,17 +1,17 @@
 services:
-  web-st127314:
+  web-st127314-a3:
     image: ${DOCKERHUB_USER:-st127314}/car-price-classifier-a3:latest
-    container_name: web-st127314
+    container_name: web-st127314-a3
     restart: unless-stopped
     environment:
       - HOST=0.0.0.0
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.web-st127314.loadbalancer.server.port=8050"
-      - "traefik.http.routers.web-st127314.rule=Host(`web-st127314.ml.brain.cs.ait.ac.th`)"
-      - "traefik.http.routers.web-st127314.entrypoints=websecure"
-      - "traefik.http.routers.web-st127314.tls=true"
-      - "traefik.http.routers.web-st127314.tls.certresolver=letsencrypt"
+      - "traefik.http.services.web-st127314-a3.loadbalancer.server.port=8050"
+      - "traefik.http.routers.web-st127314-a3.rule=Host(`web-st127314-a3.ml.brain.cs.ait.ac.th`)"
+      - "traefik.http.routers.web-st127314-a3.entrypoints=websecure"
+      - "traefik.http.routers.web-st127314-a3.tls=true"
+      - "traefik.http.routers.web-st127314-a3.tls.certresolver=letsencrypt"
     networks:
       - default
       - web
