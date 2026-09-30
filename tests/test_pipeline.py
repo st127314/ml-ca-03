@@ -15,3 +15,13 @@ def test_full_pipeline_accepts_raw_car_columns_and_predicts_four_classes():
     assert predictions.shape == (7,)
     assert set(np.unique(predictions)).issubset({0, 1, 2, 3})
 
+
+def test_a1_a2_missing_indicators_are_preserved():
+    X_train, _, _, _, _ = load_split(ROOT / "datasets" / "Cars.csv")
+    preprocessor = build_pipeline(num_epochs=1).named_steps["preprocessor"]
+    preprocessor.fit(X_train)
+    numeric_imputer = preprocessor.named_transformers_["numeric"].named_steps["imputer"]
+    assert numeric_imputer.add_indicator
+    assert len(numeric_imputer.indicator_.features_) > 0
+    assert "name" not in X_train and "torque" not in X_train
+    assert "brand" in X_train

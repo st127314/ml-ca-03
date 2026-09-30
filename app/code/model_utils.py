@@ -1,13 +1,60 @@
 """Load the fitted A3 pipeline and expose small helpers for the Dash page."""
 
 from pathlib import Path
+import hashlib
+import logging
+import os
 
 import joblib
+import mlflow
+import mlflow.sklearn
 import numpy as np
 from dash import dcc, html
 
 MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "car_price_classifier.joblib"
-model = joblib.load(MODEL_PATH)
+MODEL_NAME = "st127314-a3-model"
+LOGGER = logging.getLogger(__name__)
+
+
+def load_registry_model(tracking_uri):
+    """Load the current packaged model from one MLflow registry."""
+    mlflow.set_tracking_uri(tracking_uri)
+    client = mlflow.tracking.MlflowClient()
+    digest = hashlib.sha256(MODEL_PATH.read_bytes()).hexdigest()
+    try:
+        version = client.get_model_version_by_alias(MODEL_NAME, "production")
+        if version.tags.get("artifact_sha256") == digest:
+            return mlflow.sklearn.load_model(f"models:/{MODEL_NAME}@production")
+    except mlflow.exceptions.RestException as exc:
+        if exc.error_code not in {"RESOURCE_DOES_NOT_EXIST", "ENDPOINT_NOT_FOUND"}:
+            raise
+
+    packaged_model = joblib.load(MODEL_PATH)
+    mlflow.set_experiment("st127314-a3")
+    with mlflow.start_run(run_name="production-model") as run:
+        mlflow.sklearn.log_model(packaged_model, artifact_path="model", serialization_format="cloudpickle")
+        registered = mlflow.register_model(f"runs:/{run.info.run_id}/model", MODEL_NAME)
+    client.set_model_version_tag(MODEL_NAME, registered.version, "artifact_sha256", digest)
+    client.set_registered_model_alias(MODEL_NAME, "production", registered.version)
+    return mlflow.sklearn.load_model(f"models:/{MODEL_NAME}@production")
+
+
+def load_serving_model():
+    """Prefer configured remote MLflow, then local MLflow, then the packaged model."""
+    remote_uri = os.environ.get("MLFLOW_REMOTE_TRACKING_URI")
+    local_uri = os.environ.get("MLFLOW_TRACKING_URI")
+    # Avoid a long app startup when an optional remote server is offline.
+    os.environ.setdefault("MLFLOW_HTTP_REQUEST_TIMEOUT", "5")
+    os.environ.setdefault("MLFLOW_HTTP_REQUEST_MAX_RETRIES", "0")
+    for tracking_uri in dict.fromkeys(uri for uri in (remote_uri, local_uri) if uri):
+        try:
+            return load_registry_model(tracking_uri)
+        except (mlflow.exceptions.MlflowException, OSError) as exc:
+            LOGGER.warning("MLflow at %s is unavailable: %s", tracking_uri, exc)
+    return joblib.load(MODEL_PATH)
+
+
+model = load_serving_model()
 
 preprocessor = model.named_steps["preprocessor"]
 categorical_transformer = preprocessor.named_transformers_["categorical"]

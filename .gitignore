@@ -14,6 +14,7 @@ venv/
 env/
 .python-version
 *.pdf
+!notebooks/03_car_price_classification.pdf
 
 # Tests, coverage, and build output
 .pytest_cache/
@@ -27,9 +28,10 @@ dist/
 # Jupyter
 .ipynb_checkpoints/
 
-# MLflow local state (remote experiment metadata is not committed)
+# MLflow local state
 mlflow.db
 mlruns/
+mlartifacts/
 
 # Local configuration and secrets
 .env
@@ -39,3 +41,6 @@ mlruns/
 # Runtime files
 *.log
 *.pid
+
+# Local screenshot/automation scratch output
+output/

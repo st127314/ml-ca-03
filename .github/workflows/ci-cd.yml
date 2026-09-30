@@ -35,6 +35,14 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/car-price-classifier-a3:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/car-price-classifier-a3:${{ github.sha }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: app
+          file: app/Dockerfile.mlflow
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/car-price-classifier-a3-mlflow:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/car-price-classifier-a3-mlflow:${{ github.sha }}
 
   deploy:
     needs: build-and-deploy

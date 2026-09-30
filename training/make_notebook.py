@@ -37,7 +37,9 @@ cells = [
         "## 2. A1/A2 preprocessing and four price classes\n\n"
         "I reuse the A1/A2 rules: remove duplicate listings, test-drive cars, incompatible CNG/LPG "
         "mileage rows and an impossible odometer value; parse numeric units; extract brand; and group "
-        "rare brands. The three quartile boundaries are learned from training prices only. The outer "
+        "rare brands. Numeric median imputation includes the A1/A2 missing-value indicators; "
+        "categorical values use most-frequent imputation and one-hot encoding. "
+        "The three quartile boundaries are learned from training prices only. The outer "
         "test split therefore cannot influence either the bins or model selection."
     ),
     nbf.v4.new_code_cell(
@@ -100,20 +102,34 @@ cells = [
         "pd.DataFrame(model.test_report_).T"
     ),
     nbf.v4.new_markdown_cell(
-        "The selected unregularised model (`lambda=0`, learning rate `0.05`) achieved **0.730 validation "
-        "macro F1** and, after a full training refit, **0.740 test accuracy** and **0.734 test macro F1**. "
+        "The selected unregularised model (`lambda=0`, learning rate `0.05`) achieved **0.742 validation "
+        "macro F1** and, after a full training refit, **0.738 test accuracy** and **0.732 test macro F1**. "
         "Small L2 values tied or nearly tied the winner; stronger L2 slightly underfit. The scratch and "
         "scikit-learn report values match numerically."
     ),
     nbf.v4.new_markdown_cell(
         "## 6. MLflow model registry and deployment\n\n"
-        "`training/train.py` sets tracking URI `http://mlflow.ml.brain.cs.ait.ac.th/`, experiment "
+        "MLflow may use a configured remote server or a local server. The app tries the "
+        "remote registry first and falls back to its local registry when it is unavailable. "
+        "Training runs are logged to the selected URI; local and remote histories are separate. "
+        "`training/train.py` defaults to tracking URI `http://127.0.0.1:5000`, experiment "
         "`st127314-a3`, logs parameters/metrics without logging the dataset, saves the final pipeline, "
         "and can register `st127314-a3-model` at Staging. Run:\n\n"
         "```bash\npython training/train.py --log-mlflow --register\n```\n\n"
         "The repository also contains the Dash application, Docker image, two model-interface unit tests, "
         "and a GitHub Actions workflow. Every push runs tests; a passing push builds and publishes the "
         "Docker image. Docker Hub credentials are stored as GitHub secrets, never in the repository."
+    ),
+    nbf.v4.new_markdown_cell(
+        "### MLflow UI screenshots\n\n"
+        "The runs above are visible in the MLflow tracking UI, and the best refit is registered\n"
+        "in the Model Registry at the Staging stage.\n\n"
+        "**Experiment runs (`st127314-a3`):**\n\n"
+        "![MLflow experiment runs UI](../figures/mlflow_experiment_ui.png)\n\n"
+        "**Best model run (`best-model-refit`) with logged test metrics:**\n\n"
+        "![MLflow best run UI](../figures/mlflow_best_run_ui.png)\n\n"
+        "**Registered model (`st127314-a3-model`, Version 1, Stage: Staging):**\n\n"
+        "![MLflow model registry UI](../figures/mlflow_model_registry_ui.png)"
     ),
 ]
 

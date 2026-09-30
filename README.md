@@ -26,9 +26,9 @@ price quartiles define these classes:
 | 2 | 409,999 to 645,000 |
 | 3 | above 645,000 |
 
-Numeric values are median-imputed and standardised. Categorical values are most-frequent
-imputed and one-hot encoded. The classifier uses stable softmax, cross-entropy and
-mini-batch gradient descent. Set `l2_lambda=0` for ordinary logistic regression or a
+Numeric values are median-imputed with missing-value indicators and standardised, as in
+A1/A2. Categorical values are most-frequent imputed and one-hot encoded. The classifier
+uses stable softmax, cross-entropy and mini-batch gradient descent. Set `l2_lambda=0` for ordinary logistic regression or a
 positive value for ridge logistic regression. The intercept is not penalised.
 
 Accuracy, per-class precision/recall/F1, macro averages and weighted averages are written
@@ -46,10 +46,10 @@ outer test data is touched only once after the winner is refitted on all trainin
 
 | Result | Value |
 | --- | ---: |
-| Best validation macro F1 | 0.729 |
-| Test accuracy | 0.740 |
-| Test macro F1 | 0.734 |
-| Test weighted F1 | 0.738 |
+| Best validation macro F1 | 0.742 |
+| Test accuracy | 0.738 |
+| Test macro F1 | 0.732 |
+| Test weighted F1 | 0.736 |
 | Selected learning rate | 0.05 |
 | Selected L2 lambda | 0 (ordinary logistic regression) |
 
@@ -59,16 +59,28 @@ notebook verifies that the scratch metrics match `sklearn.metrics.classification
 
 ## Run locally
 
+From the repository root, install dependencies once:
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pytest
+```
+
+Start the Dash app:
+
+```bash
 python app/code/app.py
 ```
 
-Open `http://127.0.0.1:8050`. To rebuild the included fitted artifact without writing to
-MLflow:
+Open `http://127.0.0.1:8050` and select **Predict**. Enter **Year** and **Max power**;
+these fields are required. The other vehicle details are optional and missing values
+are filled by the fitted preprocessing pipeline. Click **Classify price** to see the
+predicted price class and the probability for each of the four classes. Stop the app
+with `Ctrl+C` in the terminal. The packaged model works without an MLflow server.
+
+To run the tests, use `pytest`. To rebuild the included fitted artifact without writing to
+MLflow, run:
 
 ```bash
 python training/train.py
@@ -76,22 +88,60 @@ python training/train.py
 
 ## MLflow and model registry
 
-The training script uses the exact assignment names:
+MLflow can use a remote tracking server or a local one. Configure the remote server
+when it is available; the app tries it first and falls back to local MLflow if the
+remote server cannot be reached. Training logs to the URI selected for that run;
+local and remote experiment histories are separate.
 
-- tracking URI: `http://mlflow.ml.brain.cs.ait.ac.th/`
+The training script uses the assignment's experiment and model names:
+
+- local tracking URI: `http://127.0.0.1:5000` (override with `MLFLOW_TRACKING_URI` or `--tracking-uri`)
 - experiment: `st127314-a3`
 - registered model: `st127314-a3-model`
 - requested stage: `Staging`
 
-The dataset is never logged. To intentionally write the experiment runs to the course
-server, save the final model, register the best refit, and move it to Staging:
+### Local MLflow
+
+Start a local tracking server from the repository root in a separate terminal:
+
+```bash
+mlflow server --host 127.0.0.1 --port 5000 \
+  --backend-store-uri sqlite:///mlflow.db \
+  --artifacts-destination ./mlartifacts --serve-artifacts
+```
+
+Then write experiment runs, save the final model, register the best refit, and move it
+to Staging. The dataset is never logged:
 
 ```bash
 python training/train.py --log-mlflow --register
 ```
 
-The remote command is explicit so importing modules, running tests, and opening the
-notebook cannot accidentally create server runs.
+Open `http://127.0.0.1:5000` to inspect the experiment and model registry.
+
+### Remote MLflow
+
+Set the remote server URL for the same training command. For the course server:
+
+```bash
+python training/train.py --log-mlflow --register \
+  --tracking-uri http://mlflow.ml.brain.cs.ait.ac.th/
+```
+
+This creates runs and a registered model on the selected remote server; it does not
+move earlier local runs. For app deployment, set `MLFLOW_REMOTE_TRACKING_URI` on the
+VM to the remote URL. The app tries that registry first, then its local Compose
+registry at `http://mlflow:5000`. If both registries are unavailable, it loads the
+model packaged in the app image.
+
+The separate VM Compose stack can start its MLflow service with
+`docker compose -f app/docker-compose.yaml up -d mlflow` after the image is published.
+It stores its tracking database and artifacts in the persistent
+`mlflow-data` volume. The Dash app registers the model packaged in its image under the
+`production` alias in the available registry. It loads that registered version for predictions. A changed
+packaged model creates a new version on the next deployment. The MLflow UI is
+available on the VM at `http://127.0.0.1:5000`; the port is bound to loopback
+and is not exposed to the internet.
 
 ## CI/CD and deployment
 

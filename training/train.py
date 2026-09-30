@@ -1,13 +1,14 @@
 """Train, compare, log, register, and save the A3 classifier.
 
-Run from the repository root.  Remote MLflow writes happen only when ``--log-mlflow``
-is supplied, so tests and local model builds never mutate the course server.
+Run from the repository root. MLflow writes happen only when ``--log-mlflow``
+is supplied. The default tracking URI points to a local server.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -28,7 +29,7 @@ from data_prep import bucket_prices, load_clean_data, price_bin_edges  # noqa: E
 from logistic_regression import LogisticRegression, classification_report_from_scratch  # noqa: E402
 
 STUDENT_ID = "st127314"
-TRACKING_URI = "http://mlflow.ml.brain.cs.ait.ac.th/"
+TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
 EXPERIMENT_NAME = f"{STUDENT_ID}-a3"
 MODEL_NAME = f"{STUDENT_ID}-a3-model"
 NUMERIC = ["year", "km_driven", "owner", "mileage", "engine", "max_power", "seats"]
@@ -37,7 +38,7 @@ CATEGORICAL = ["brand", "fuel", "seller_type", "transmission"]
 
 def build_pipeline(l2_lambda=0.0, learning_rate=0.05, num_epochs=600):
     numeric = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
+        ("imputer", SimpleImputer(strategy="median", add_indicator=True)),
         ("scaler", StandardScaler()),
     ])
     categorical = Pipeline([
@@ -159,7 +160,7 @@ def train(args):
         with mlflow.start_run(run_name="best-model-refit") as final_run:
             mlflow.log_params({key: best_row[key] for key in ("l2_lambda", "learning_rate")})
             mlflow.log_metrics(test_metrics)
-            mlflow.sklearn.log_model(best_pipeline, "model")
+            mlflow.sklearn.log_model(best_pipeline, "model", serialization_format="cloudpickle")
             best_run_id = final_run.info.run_id
     # Metadata stays on the Pipeline so the deployed app needs only one artifact.
     args.output.parent.mkdir(parents=True, exist_ok=True)

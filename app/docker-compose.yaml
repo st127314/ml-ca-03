@@ -1,10 +1,31 @@
 services:
+  mlflow:
+    image: ${DOCKERHUB_USER:-st127314}/car-price-classifier-a3-mlflow:latest
+    restart: unless-stopped
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////mlflow/mlflow.db --artifacts-destination /mlflow/artifacts --serve-artifacts --allowed-hosts mlflow:5000,localhost,127.0.0.1
+    volumes:
+      - mlflow-data:/mlflow
+    ports:
+      - "127.0.0.1:5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - default
+
   web-st127314-a3:
     image: ${DOCKERHUB_USER:-st127314}/car-price-classifier-a3:latest
     container_name: web-st127314-a3
     restart: unless-stopped
     environment:
       - HOST=0.0.0.0
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_REMOTE_TRACKING_URI=${MLFLOW_REMOTE_TRACKING_URI:-}
+    depends_on:
+      mlflow:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.web-st127314-a3.loadbalancer.server.port=8050"
@@ -24,3 +45,6 @@ networks:
   default:
   web:
     external: true
+
+volumes:
+  mlflow-data:

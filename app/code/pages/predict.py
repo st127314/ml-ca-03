@@ -21,7 +21,7 @@ layout = html.Div([
         html.P("CAR PRICE CLASSIFIER", className="eyebrow"),
         html.H1("Find the likely selling-price band"),
         html.P(
-            "Enter the vehicle details below. Missing optional fields are imputed by the "
+            "Year and max power are required. Missing optional fields are imputed by the "
             "same fitted preprocessing pipeline used during training.",
             className="lede",
         ),
@@ -31,7 +31,7 @@ layout = html.Div([
             html.H2("Vehicle details"),
             html.Div([
                 dropdown_component("brand", "Brand", category_options["brand"], "Select a brand"),
-                number_component("year", "Year", "e.g. 2017", min=1980, max=2030),
+                number_component("year", "Year (required)", "e.g. 2017", min=1980, max=2030, required=True),
                 number_component("km-driven", "Kilometres driven", min=0),
                 dropdown_component("fuel", "Fuel", category_options["fuel"], "Select fuel"),
                 dropdown_component("seller-type", "Seller type", category_options["seller_type"], "Select seller"),
@@ -42,7 +42,7 @@ layout = html.Div([
                 ], className="form-field"),
                 number_component("mileage", "Mileage (kmpl)", min=0),
                 number_component("engine", "Engine (CC)", min=0),
-                number_component("max-power", "Max power (bhp)", min=0),
+                number_component("max-power", "Max power (bhp, required)", min=0, required=True),
                 number_component("seats", "Seats", min=1, max=20),
             ], className="form-grid"),
             html.Button("Classify price", id="predict-button", n_clicks=0, className="predict-button"),
@@ -86,4 +86,3 @@ def classify_price(n_clicks, brand, year, km_driven, fuel, seller_type,
             for index, probability in enumerate(probabilities)
         ], className="coef-list"),
     ])
-
