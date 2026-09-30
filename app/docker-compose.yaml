@@ -45,6 +45,7 @@ networks:
   default:
   web:
     external: true
+    name: traefik_default
 
 volumes:
   mlflow-data:
